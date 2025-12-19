@@ -2,11 +2,10 @@ package com.example.demo.model;
 
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+
+@Data
 @Embeddable
 @AllArgsConstructor
 public class Endereco {

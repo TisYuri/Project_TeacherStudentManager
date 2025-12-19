@@ -1,14 +1,14 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Table(name = "usuario")
 @Inheritance(strategy = InheritanceType.JOINED)
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public abstract class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
