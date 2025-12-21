@@ -101,7 +101,7 @@ public class ProfessorController {
             @ApiResponse(responseCode = "404", description = "Professor não encontrado"),
             @ApiResponse(responseCode = "400", description = "Requisição inválida (ex: CPF duplicado)")
     })
-    @PostMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Professor> atualizar(
             @Parameter(description = "ID do professor a ser atualizado") @PathVariable Long id,
             @RequestBody(description = "Dados do professor para atualização") @org.springframework.web.bind.annotation.RequestBody Professor professor){

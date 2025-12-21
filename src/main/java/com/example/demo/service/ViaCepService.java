@@ -18,12 +18,11 @@ public class ViaCepService {
     private RestTemplate restTemplate;
 
     private static final String URL_VIACEP = "https://viacep.com.br/ws/{cep}/json/";
-    @Autowired
-    private UrlBasedViewResolver urlBasedViewResolver;
 
     public ViaCepResponse bucarEnderecoPorCep(String cep){
         try{
-            String url = URL_VIACEP.replace("{cep}", cep);
+            String cleanedCep = cep.replaceAll("\\D", ""); // Remove non-digits
+            String url = URL_VIACEP.replace("{cep}", cleanedCep);
 
             ResponseEntity<ViaCepResponse> response = restTemplate.getForEntity(url, ViaCepResponse.class);
             if(response.getStatusCode().is2xxSuccessful()){

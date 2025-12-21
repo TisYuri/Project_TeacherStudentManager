@@ -1,7 +1,9 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.ViaCepResponse;
 import com.example.demo.exception.CpfDuplicadoException;
 import com.example.demo.exception.RecursoNaoEncontradoException;
+import com.example.demo.model.Endereco;
 import com.example.demo.model.Professor;
 import com.example.demo.repository.ProfessorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,8 @@ import java.util.Optional;
 public class ProfessorService {
     @Autowired
     ProfessorRepository professorRepository;
+    @Autowired
+    ViaCepService viaCepService;
 
     public List<Professor> listarTodos(){
         return professorRepository.findAll();
@@ -57,9 +61,22 @@ public class ProfessorService {
         if(professorExistente.isPresent() && !professorExistente.get().getId().equals(professor.getId())){
             throw new CpfDuplicadoException("CPF já cadastrado: " + professor.getCpf());
         }
-        else{
-            return professorRepository.save(professor);
+        
+        Endereco endereco = professor.getEndereco();
+        if(endereco != null && endereco.getCep() != null && !endereco.getCep().isEmpty()){
+            try{
+                ViaCepResponse dadosCep = viaCepService.bucarEnderecoPorCep(professor.getEndereco().getCep());
+
+                endereco.setBairro(dadosCep.getBairro());
+                endereco.setCidade(dadosCep.getCidade());
+                endereco.setEstado(dadosCep.getEstado());
+                endereco.setLogradouro(dadosCep.getLogradouro());
+
+            }catch(Exception e){
+                throw new RuntimeException("Erro ao buscar endereço para o CEP: " + professor.getEndereco().getCep(), e);
+            }
         }
+        return professorRepository.save(professor);
     }
 
     public Professor atualizar(Long id, Professor professorAtualizado){

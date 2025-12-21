@@ -72,7 +72,7 @@ public class AlunoService {
                 endereco.setLogradouro(dadosCep.getLogradouro());
 
             }catch(Exception e){
-                throw new RuntimeException("Falha ao se integrar com a API cep.", e);
+                throw new RuntimeException("Erro ao buscar endereço para o CEP: " + aluno.getEndereco().getCep(), e);
             }
         }
         Aluno alunoSalvo = alunoRepository.save(aluno);
