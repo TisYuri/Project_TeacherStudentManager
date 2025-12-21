@@ -1,8 +1,13 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.ViaCepResponse;
+import com.example.demo.exception.RecursoNaoEncontradoException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
 
@@ -20,10 +25,21 @@ public class ViaCepService {
         try{
             String url = URL_VIACEP.replace("{cep}", cep);
 
-            ViaCepResponse response = restTemplate.getForObject(url, ViaCepResponse.class);
-            return response;
-        }catch (Exception e){
-            throw e;
+            ResponseEntity<ViaCepResponse> response = restTemplate.getForEntity(url, ViaCepResponse.class);
+            if(response.getStatusCode().is2xxSuccessful()){
+                ViaCepResponse dados = response.getBody();
+                if(dados != null && dados.getLogradouro() == null){
+                    throw new RecursoNaoEncontradoException("CEP não encontrado na base da ViaCEP: " + cep);
+                }
+                return dados;
+            }
+            else{
+                throw new RuntimeException("Erro ao buscar CEP na API externa. Código: " + response.getStatusCode().value());
+            }
+        }catch (HttpClientErrorException | HttpServerErrorException e ){
+            throw new RuntimeException("Erro HTTP ao chamar a API ViaCEP: " + e.getMessage());
+        }catch (ResourceAccessException e) {
+            throw new RuntimeException("Erro de rede ao chamar a API ViaCEP: " + e.getMessage());
         }
     }
 
