@@ -1,20 +1,26 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.ViaCepResponse;
 import com.example.demo.exception.CpfDuplicadoException;
 import com.example.demo.exception.RecursoNaoEncontradoException;
 import com.example.demo.model.Aluno;
+import com.example.demo.model.Endereco;
 import com.example.demo.repository.AlunoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 @Service
 public class AlunoService {
 
     @Autowired
     AlunoRepository alunoRepository;
+    @Autowired
+    ViaCepService viaCepService;
 
     public List<Aluno> listarTodos(){
         return alunoRepository.findAll();
@@ -55,9 +61,22 @@ public class AlunoService {
         if(alunoExistente.isPresent() && !alunoExistente.get().getId().equals(aluno.getId())){
             throw new CpfDuplicadoException("CPF já cadastrado: " + aluno.getCpf());
         }
-        else {
-            return alunoRepository.save(aluno);
+        Endereco endereco = aluno.getEndereco();
+        if(endereco != null && endereco.getCep() != null && !endereco.getCep().isEmpty()){
+            try{
+                ViaCepResponse dadosCep = viaCepService.bucarEnderecoPorCep(aluno.getCpf());
+
+                endereco.setBairro(dadosCep.getBairro());
+                endereco.setCidade(dadosCep.getCidade());
+                endereco.setEstado(dadosCep.getEstado());
+                endereco.setLogradouro(dadosCep.getLogradouro());
+
+            }catch(Exception e){
+                throw new RuntimeException("Falha ao se integrar com a API cep.", e);
+            }
         }
+        Aluno alunoSalvo = alunoRepository.save(aluno);
+        return alunoSalvo;
     }
 
     public Aluno atualizar(Long id, Aluno alunoAtualizado){
