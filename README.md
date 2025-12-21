@@ -50,6 +50,28 @@ To get a local copy up and running follow these simple steps.
       ```
     *   The database schema will be automatically created and managed by Flyway when the application starts.
 
+### Running with Docker Compose
+
+If you have Docker and Docker Compose installed, you can easily start the required MySQL database with the following command:
+
+```sh
+docker-compose up -d
+```
+
+This will start a MySQL container in the background with the necessary database and user created.
+
+To stop the database container, you can run:
+
+```sh
+docker-compose down
+```
+
+**Note:** The application itself is not containerized in this setup. You still need to run the Spring Boot application separately after the database is running:
+
+```sh
+./mvnw spring-boot:run
+```
+
 ## Usage
 
 ### Running the Application
