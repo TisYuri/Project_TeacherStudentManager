@@ -64,7 +64,7 @@ public class AlunoService {
         Endereco endereco = aluno.getEndereco();
         if(endereco != null && endereco.getCep() != null && !endereco.getCep().isEmpty()){
             try{
-                ViaCepResponse dadosCep = viaCepService.bucarEnderecoPorCep(aluno.getCpf());
+                ViaCepResponse dadosCep = viaCepService.bucarEnderecoPorCep(aluno.getEndereco().getCep());
 
                 endereco.setBairro(dadosCep.getBairro());
                 endereco.setCidade(dadosCep.getCidade());
